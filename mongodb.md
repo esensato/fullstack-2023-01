@@ -25,6 +25,8 @@ https://www.mongodb.com/atlas/database - cluster online
 
 https://www.mongodb.com/try/download/community - community download instalação local
 
+[Mongodb Shell](https://www.mongodb.com/try/download/shell)
+
 ## Prática
 
 Iniciar o servidor:

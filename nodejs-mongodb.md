@@ -1,0 +1,344 @@
+### Acesso
+
+### Instalação Nodejs
+
+[Download Nodejs](https://nodejs.org/en/download/)
+
+### Atualização npm / nodejs
+
+```
+npm install -g npm@latest
+npm -v
+npm install -g n
+n latest
+node -v
+```
+
+### Criar um Projeto Nodejs
+
+- Criar o diretório do projeto: `mkdir nodejs_mongodb`
+- Acessar o diretório criado: `cd nodejs_mongodb`
+- Iniciar o projeto Nodejs: `npm init -y`
+
+### Mongodb Driver
+
+- [Documentação Mongodb Nodejs Driver](https://www.mongodb.com/docs/drivers/node/current/)
+
+- Instalação (executar dentro da pasta do projeto): `npm install --save mongodb`
+
+### Obter URL de Conexão
+
+- [Acessar o Atlas](https://www.mongodb.com/atlas/database)
+
+![atlas-1](img/atlas-1.png)
+
+![atlas-2](img/atlas-2.png)
+
+![atlas-3](img/atlas-3.png)
+
+### Código de Teste com Mongodb
+
+- Importar a biblioteca `mongodb`
+
+```
+const { MongoClient } = require("mongodb");
+```
+- Definir a string de conexão e substituir `<password>` com a senha da instância do banco de dados criado no Atlas
+
+```
+const uri = "mongodb+srv://teste:<password>@cluster0.wnbdk2i.mongodb.net/?retryWrites=true&w=majority";
+
+```
+- Instanciar um cliente
+```
+const client = new MongoClient(uri);
+```
+- Criar uma função assíncrona:
+
+```
+async function runMongodb() {
+  try {
+
+  } finally {
+
+  }
+}
+
+runMongodb().catch(console.dir);
+process.exit(0);
+```
+- Efetuar a conexão com o banco de dados `db` e obter a coleção `collection`
+```
+const pizzaria = client.db('pizzaria');
+const pedidos = pizzaria.collection('pedidos');
+```
+- Sempre fechar a conexão:
+```
+await client.close();
+```
+- Criar um pedido:
+```
+const resultado = await pedidos.insertOne({pizza: "Marguerita", quantidade: 2, endereco: "Rua Z, 234"});
+console.log(resultado);
+```
+- Localizar um pedido:
+
+```
+const pedido = await pedidos.findOne();
+console.log(pedido);
+```
+- Atualizar um pedido pelo `Id`:
+```
+const { MongoClient, ObjectId } = require("mongodb");
+const resultado = await pedidos.updateOne({_id: new ObjectId("63f901e76ea77a958cd09600")}, {$set: {quantidade: 3}});
+console.log(resultado);
+```
+- Remover um pedido pelo `Id`:
+```
+const resultado = await pedidos.deleteOne({_id: new ObjectId("63f901e76ea77a958cd09600")});
+console.log(resultado);
+```
+- Pesquisar mais do que um registro:
+```
+const resultado = await pedidos.find().toArray();
+console.log(resultado);
+```
+- Outra forma:
+```
+const resultado = await pedidos.find();
+await resultado.forEach((obj) => {
+    console.log(obj.pizza, obj.quantidade, obj.endereco)
+});
+```
+- Contando documentos
+```
+const resultado = await pedidos.countDocuments();
+console.log(resultado);
+```
+### Mongoose Driver
+
+- [Documentação Mongoose Nodejs Driver](https://mongoosejs.com/docs/index.html)
+
+- Instalação (executar dentro da pasta do projeto): `npm install --save mongoose`
+
+### Código de Teste com Mongoose
+
+- Importar a biblioteca `mongoose`
+
+```
+const mongoose = require('mongoose');
+```
+- Definir a string de conexão e substituir `<password>` com a senha da instância do banco de dados criado no Atlas
+
+```
+const uri = "mongodb+srv://teste:<password>@cluster0.wnbdk2i.mongodb.net/?retryWrites=true&w=majority";
+
+```
+- Criar uma função assíncrona (não precisa do `close`):
+
+```
+async function runMongoose() {
+
+}
+
+runMongoose().catch(console.dir);
+```
+- Estabelecer a conexão:
+```
+await mongoose.connect(uri);
+```
+- [Criar um schema](https://mongoosejs.com/docs/guide.html#definition):
+```
+const pedidoSchema = new mongoose.Schema({
+    pizza: String,
+    quantidade: Number,
+    endereco: String    
+    });
+```
+- Instanciar um model:
+```
+const Pedido = mongoose.model('Pedido', pedidoSchema);
+```
+- Instanciar os objetos:
+```
+const pedido = new Pedido({ pizza: 'Queijo' });
+```
+- Salvar
+```
+await pedido.save();
+```
+- Localizar um pedido:
+
+```
+const resultado = await Pedido.findOne({}).exec();
+console.log(resultado)
+```
+- Atualizar um pedido pelo `Id`:
+```
+const resultado = await Pedido.updateOne({_id: new mongoose.Types.ObjectId("63ef7324bcb72bc07fe84d84")}, {pizza: "Portuguesa"});
+console.log(resultado)
+```
+- Remover um pedido pelo `Id`:
+```
+const resultado = await Pedido.deleteOne({_id: new mongoose.Types.ObjectId("63fa0413539ca38075c8b887")});
+console.log(resultado)
+```
+- [Pesquisar mais do que um registro](https://mongoosejs.com/docs/queries.html):
+```
+const resultado = await Pedido.find({}).exec();
+console.log(resultado)
+```
+### Validação do Schema
+- Na definição do schema podem ser definidas [restrições](https://mongoosejs.com/docs/schematypes.html) de valores:
+
+```
+const pedidoSchema = new mongoose.Schema({
+    pizza: {type:String, required: [true, "Nome da pizza é obrigatório"]},
+    quantidade: Number,
+    endereco: String    
+    });
+```
+- Posteriormente podem ser validadas:
+```
+const validacao = pedido.validateSync();
+console.log(validacao.errors['pizza'].message);
+```
+### Estruturando o Projeto
+- Criar uma pasta para armazenar os schemas, por exemplo `model`
+- Criar uma pasta para armazenar a lógica de negócio, por exemplo `controller`
+- Cada objeto do schema será representado por um arquivo `.js` contendo a sua cefinição
+- Exemplo: `livro.js`
+```
+const mongoose = require('mongoose');
+
+const livroSchema = mongoose.Schema({
+    titulo: {type: String, required: true},
+    autor: {type: String, required: true},
+    resumo: String
+});
+
+module.exports = mongoose.model('Livro', livroSchema);
+```
+- Exemplo Controller: `livro-controller.js`
+```
+const mongoose = require ('mongoose');
+const Livro = require('../model/livro');
+
+const criarLivro = async (titulo, autor, resumo) => {
+
+    const livro = new Livro({
+        titulo: titulo,
+        autor: autor,
+        resumo: resumo
+    });
+
+    try {
+
+        const ret = await livro.save();
+
+    } catch (err) {
+        console.log('Erro ao criar livro: ', err);
+    }
+}
+
+exports.criarLivro = criarLivro;
+```
+- Teste
+```
+const mongoose = require('mongoose');
+const livroController = require('./controller/livro-controller');
+
+mongoose.set('strictQuery', false);
+
+const uri = "mongodb+srv://teste:teste@cluster0.wnbdk2i.mongodb.net/biblioteca?retryWrites=true&w=majority";s
+
+mongoose.connect(uri).then(() => {
+    console.log('conectado');
+    livroController.criarLivro('Titlulo 1', 'Eu mesmo', 'Livro muito legal');
+})
+```
+- Obter o livro pelo id:
+```
+const obterLivro = async (id) => {
+    return await Livro.findById(id);
+}
+```
+### Relacionamentos
+- Criar um relacionamento entre livro e empréstimos
+- Cada livro poderá ter vários empréstimos e um empréstimo somente será relacionado a um livro
+- Utilizar a referência ao schema livro dentro de empréstimo
+```
+livro: {type: mongoose.Types.ObjectId, required: true, ref: 'Livro'}
+```
+### Relacionamento unilateral
+```
+const emprestarLivro = async (livro, usuario, data) => {
+
+    try {
+
+        const emprestimo = new Emprestimo({data: data, livro: livro, usuario: usuario});
+        await emprestimo.save();
+
+    } catch (err) {
+        console.log(err);
+    }
+
+}
+```
+- Teste:
+```
+const ret = livroController.obterLivro('63fe47f4ffe2de2dedda865d').then((ret) => {
+
+    console.log(ret);
+    livroController.emprestarLivro(ret, 'esensato', new Date()).then(() => {
+        console.log("ok")
+        process.exit(0);
+    })
+
+});
+```
+### Transações
+- Quando mais de uma ação que altera dados na base é realizada ela deve ser eonvolvida em uma transação
+```
+try {
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    // Operações dentro da transação
+    await session.commitTransaction();
+
+} catch (err) {
+    console.log(err);
+}
+```
+### Relacionamento Bilateral
+- Alterar o Livro para incluir uma coleção de empréstimos:
+```
+emprestimos: [{type: mongoose.Types.ObjectId, required: true, ref: 'Emprestimo'}]
+```
+- Alterar o `emprestarLivro` para incluir o relacionamento com empréstimo
+```
+const emprestarLivro = async (livro, usuario, data) => {
+
+    try {
+
+        const session = await mongoose.startSession();
+        session.startTransaction();
+        const emprestimo = new Emprestimo({data: data, livro: livro, usuario: usuario});
+        await emprestimo.save({session: session});
+        livro.emprestimos.push(emprestimo)
+        await livro.save({session: session});
+        await session.commitTransaction();
+
+    } catch (err) {
+        console.log(err);
+    }
+
+}
+```
+### Exercício
+- Implementar uma funcionalidade de gestão de usuários contemplando:
+    - Possibilidade de criar um novo usuário contendo nome, username, senha e email
+    - Validar o login e senha
+    - Permitir a alteração da senha
+    - Gravar um histórico de acessos do usuário contendo a data de login

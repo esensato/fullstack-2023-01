@@ -59,13 +59,15 @@ const client = new MongoClient(uri);
 async function runMongodb() {
   try {
 
+    process.exit(0);
+
   } finally {
 
   }
 }
 
 runMongodb().catch(console.dir);
-process.exit(0);
+
 ```
 - Efetuar a conexão com o banco de dados `db` e obter a coleção `collection`
 ```
@@ -129,9 +131,10 @@ console.log(resultado);
 const mongoose = require('mongoose');
 ```
 - Definir a string de conexão e substituir `<password>` com a senha da instância do banco de dados criado no Atlas
+- Definir o nome do banco de dados em `<nome_bd>`, por exemplo, pedidos
 
 ```
-const uri = "mongodb+srv://teste:<password>@cluster0.wnbdk2i.mongodb.net/?retryWrites=true&w=majority";
+const uri = "mongodb+srv://teste:<password>@cluster0.wnbdk2i.mongodb.net/<nome_bd>?retryWrites=true&w=majority";
 
 ```
 - Criar uma função assíncrona (não precisa do `close`):
@@ -139,6 +142,7 @@ const uri = "mongodb+srv://teste:<password>@cluster0.wnbdk2i.mongodb.net/?retryW
 ```
 async function runMongoose() {
 
+    process.exit(0);
 }
 
 runMongoose().catch(console.dir);
@@ -165,12 +169,24 @@ const pedido = new Pedido({ pizza: 'Queijo' });
 ```
 - Salvar
 ```
-await pedido.save();
+const resultado = await pedido.save();
+console.log('Pedido salvo!', resultado.toJSON({getters: true}));
+console.log('Pedido salvo!', resultado.toJSON({getters: true}).id);
 ```
 - Localizar um pedido:
 
 ```
-const resultado = await Pedido.findOne({}).exec();
+const Pedido = mongoose.model('Pedido', pedidoSchema);
+
+let resultado = await Pedido.findOne().exec();
+console.log(resultado.toJSON({getters: true}));
+
+resultado = await Pedido.findOne({_id: "64025079d4003ffbad15c109"}, "pizza endereco -_id").exec();    
+console.log(resultado);
+```
+- [Pesquisar mais do que um registro](https://mongoosejs.com/docs/queries.html):
+```
+resultado = await Pedido.find().exec();
 console.log(resultado)
 ```
 - Atualizar um pedido pelo `Id`:
@@ -183,11 +199,7 @@ console.log(resultado)
 const resultado = await Pedido.deleteOne({_id: new mongoose.Types.ObjectId("63fa0413539ca38075c8b887")});
 console.log(resultado)
 ```
-- [Pesquisar mais do que um registro](https://mongoosejs.com/docs/queries.html):
-```
-const resultado = await Pedido.find({}).exec();
-console.log(resultado)
-```
+
 ### Validação do Schema
 - Na definição do schema podem ser definidas [restrições](https://mongoosejs.com/docs/schematypes.html) de valores:
 
@@ -203,6 +215,13 @@ const pedidoSchema = new mongoose.Schema({
 const validacao = pedido.validateSync();
 console.log(validacao.errors['pizza'].message);
 ```
+
+### Exercício
+- Criar um schema para pizza com nome e preço
+- Cadastrar três pizzas utilizando mongoose
+- Alterar o schema pedido para possibilidar informar o _id da pizza ao invés do seu nome
+- Criar uma função que retorna o nome, preço e endereço de entrega da pizza
+
 ### Estruturando o Projeto
 - Criar uma pasta para armazenar os schemas, por exemplo `model`
 - Criar uma pasta para armazenar a lógica de negócio, por exemplo `controller`
@@ -277,7 +296,7 @@ const emprestarLivro = async (livro, usuario, data) => {
     try {
 
         const emprestimo = new Emprestimo({data: data, livro: livro, usuario: usuario});
-        await emprestimo.save();
+        return await emprestimo.save();
 
     } catch (err) {
         console.log(err);
@@ -290,8 +309,8 @@ const emprestarLivro = async (livro, usuario, data) => {
 const ret = livroController.obterLivro('63fe47f4ffe2de2dedda865d').then((ret) => {
 
     console.log(ret);
-    livroController.emprestarLivro(ret, 'esensato', new Date()).then(() => {
-        console.log("ok")
+    livroController.emprestarLivro(ret, 'esensato', new Date()).then((resultado) => {
+        console.log("ok", resultado);
         process.exit(0);
     })
 
@@ -329,16 +348,61 @@ const emprestarLivro = async (livro, usuario, data) => {
         livro.emprestimos.push(emprestimo)
         await livro.save({session: session});
         await session.commitTransaction();
+        return emprestimo;
 
     } catch (err) {
         console.log(err);
     }
+}
+```
+
+- Obtendo todos os livros emprestados por usuário
+
+```
+const emprestimosPorUsuario = async (usuario) => {
+
+    return await Emprestimo.find({usuario: usuario}).populate('livro');
 
 }
 ```
+
+- Teste
+
+```
+let resultado = await livroController.emprestimosPorUsuario('esensato');
+resultado.forEach((item) => console.log(item.livro.titulo))
+```
+
+- Devolução do Livro
+    - Obter o livro pelo título juntamente com a lista de empréstimos
+    - Localizar o empréstimo por meio do nome do usuário e o livro (objeto)
+    - Remover o empréstimo da lista de empréstimos do livro
+    - Salvar o livro
+    - Remover o empréstimo
+
+```
+const devolucaoLivro = async (usuario, titulo) => {
+
+    const livro = await Livro.findOne({titulo: titulo}).populate("emprestimos");
+    const emprestimo = await Emprestimo.findOne({usuario: usuario, livro: livro});
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    livro.emprestimos.pull(emprestimo);
+    await livro.save({session: session});
+    await emprestimo.remove({session: session});
+    await session.commitTransaction();
+    return livro;
+
+}
+```
+
 ### Exercício
 - Implementar uma funcionalidade de gestão de usuários contemplando:
-    - Possibilidade de criar um novo usuário contendo nome, username, senha e email
+    - Possibilidade de criar um novo usuário contendo nome, username, senha e email (todos os campos devem ser obrigatórios)
     - Validar o login e senha
     - Permitir a alteração da senha
-    - Gravar um histórico de acessos do usuário contendo a data de login
+    - Gravar um histórico de acessos do usuário contendo a data de login e um indicador (true / false) se a senha foi digitada corretamente
+    - Criar um indicador (true / false) e uma quantidade de logins com falha no usuário
+    - Bloquear o usuário caso o total de logins com falha seja maior ou igual a 3
+    - Implementar uma funcionalidade que permita o desbloqueio de um usuário por um usuário do tipo administrador (criar um indicador para usuários administradores)

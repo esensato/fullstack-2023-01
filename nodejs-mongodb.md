@@ -214,6 +214,9 @@ const pedidoSchema = new mongoose.Schema({
 ```
 const validacao = pedido.validateSync();
 console.log(validacao.errors['pizza'].message);
+for (let erro in validacao.errors) {
+    console.log(validacao.errors[erro].message);
+}
 ```
 
 ### Exercício

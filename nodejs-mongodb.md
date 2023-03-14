@@ -222,7 +222,7 @@ for (let erro in validacao.errors) {
 ### Exercício
 - Criar um *schema* para pizza com nome e preço
 - Cadastrar três pizzas utilizando o *mongoose*
-- Alterar o schema pedido para possibilidar informar o `_id` da pizza ao invés do seu nome
+- Alterar o *schema* pedido para possibilidar informar o `_id` da pizza ao invés do seu nome
 - Criar uma função que retorna o nome, preço e endereço de entrega da pizza com base no nome de usuário que solicitou o pedido
 
 ### Breve nota sobre módulos JS

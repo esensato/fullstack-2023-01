@@ -225,7 +225,53 @@ for (let erro in validacao.errors) {
 - Alterar o schema pedido para possibilidar informar o _id da pizza ao invés do seu nome
 - Criar uma função que retorna o nome, preço e endereço de entrega da pizza
 
+### Breve nota sobre módulos JS
+- NodeJS implementa uma estrutura de módulos bastante simples baseada no *CommonJS*
+- Tudo o que é declarad dentro de um arquivo (módulo) é considerado privado: variáveis, constantes, funções, etc...
+- Para que os elementos sejam declatrados públicos eles devem ser declarados na cláusula * exports*
+- Arquivo `mensagem.js` com a constante `mensagem` privada
+    ```
+    const mensagem = "Boa noite!";
+
+    module.exports.mensagem = mensagem;
+    ```
+- Ao importar e exibir o conteúdo de `mensagem` em outro módulo:
+
+    ```
+    // importar o módulo mensagem.js
+    const msg = require("./mensagem");
+
+    console.log(msg);
+    console.log(msg.mensagem);
+    ```
+
+- Alterar o módulo `mensagem.js` para exportar (público) a constante `mensagem`
+
+    ```
+    const mensagem = "Boa noite!";
+
+    module.exports.mensagem = mensagem;
+    ```
+
+- Agora `mensagem` será acessível aos outros módulos
+
+- Pode-se importar o módulo todo ou somente os elementos exportados por ele
+
+```
+const { mensagem } = require("./mensagem");
+
+console.log(mensagem);
+```
+
+- Caso o módulo tenha somente um item declarado pode-se omitir o nome no `exports`:
+
+```
+const mensagem = "Boa noite!";
+module.exports = mensagem;
+```
+
 ### Estruturando o Projeto
+
 - Criar uma pasta para armazenar os schemas, por exemplo `model`
 - Criar uma pasta para armazenar a lógica de negócio, por exemplo `controller`
 - Cada objeto do schema será representado por um arquivo `.js` contendo a sua cefinição

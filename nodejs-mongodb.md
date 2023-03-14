@@ -159,7 +159,7 @@ const pedidoSchema = new mongoose.Schema({
     endereco: String    
     });
 ```
-- Instanciar um model:
+- Instanciar um **model**:
 ```
 const Pedido = mongoose.model('Pedido', pedidoSchema);
 ```
@@ -338,7 +338,9 @@ const obterLivro = async (id) => {
 ```
 livro: {type: mongoose.Types.ObjectId, required: true, ref: 'Livro'}
 ```
-### Relacionamento unilateral
+### Relacionamento Unilateral
+
+- Neste exemplo é criado um relacionamento entre o objeto `Emprestimo` e `Livro`
 ```
 const emprestarLivro = async (livro, usuario, data) => {
 

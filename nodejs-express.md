@@ -1,6 +1,6 @@
 ## Nodejs Express
 
-- Javascript: ambiente de execução é o Broser
+- Javascript: ambiente de execução é o *Browser*
 - Nodejs: ambiente de execução é o sistema operacional
 - Nem todas as bibliotecas, frameworks e funções estão disponíveis no Nodejs como `alert`, `DOM`, etc...
 - Porém algumas operações somente são possíveis com o node, por exemplo, manipulação de arquivos.
@@ -279,4 +279,3 @@ app.get("/json", (req, res, next) => {
 
   - Criar uma nota rota para exibir todas as disciplinas (`curso/disciplinas`) de um curso
 
-  

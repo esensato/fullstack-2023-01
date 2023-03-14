@@ -220,15 +220,15 @@ for (let erro in validacao.errors) {
 ```
 
 ### Exercício
-- Criar um schema para pizza com nome e preço
-- Cadastrar três pizzas utilizando mongoose
-- Alterar o schema pedido para possibilidar informar o _id da pizza ao invés do seu nome
-- Criar uma função que retorna o nome, preço e endereço de entrega da pizza
+- Criar um *schema* para pizza com nome e preço
+- Cadastrar três pizzas utilizando o *mongoose*
+- Alterar o schema pedido para possibilidar informar o `_id` da pizza ao invés do seu nome
+- Criar uma função que retorna o nome, preço e endereço de entrega da pizza com base no nome de usuário que solicitou o pedido
 
 ### Breve nota sobre módulos JS
 - NodeJS implementa uma estrutura de módulos bastante simples baseada no *CommonJS*
-- Tudo o que é declarad dentro de um arquivo (módulo) é considerado privado: variáveis, constantes, funções, etc...
-- Para que os elementos sejam declatrados públicos eles devem ser declarados na cláusula * exports*
+- Tudo o que é declarado dentro de um arquivo (módulo) é considerado privado: variáveis, constantes, funções, etc...
+- Para que os elementos sejam declatrados públicos eles devem ser declarados na cláusula *exports*
 - Arquivo `mensagem.js` com a constante `mensagem` privada
     ```
     const mensagem = "Boa noite!";

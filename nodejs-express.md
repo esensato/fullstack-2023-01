@@ -260,7 +260,7 @@ app.get("/json", (req, res, next) => {
 
   const router = express.Router();
 
-  router.get('/notas', (req, res, next) => {
+  router.get('/aluno/notas', (req, res, next) => {
       res.json({nota: 10.0});
   })
 
@@ -274,3 +274,9 @@ app.get("/json", (req, res, next) => {
 
     app.use(alunoRouter)
   ```
+
+  ### Exercício
+
+  - Criar uma nota rota para exibir todas as disciplinas (`curso/disciplinas`) de um curso
+
+  

@@ -9,7 +9,9 @@ const pizzaSchema = mongoose.Schema({
 
 const pedidoSchema = new mongoose.Schema({
     usuario: {type: String, required: true},
-    pizza: {type: mongoose.Types.ObjectId, required: [true, "Nome da pizza é obrigatório"]},
+    pizza: [{type: mongoose.Types.ObjectId, 
+            required: [true, "Nome da pizza é obrigatório"],
+            ref: "Pizza"}],
     quantidade: Number,
     endereco: String    
     });
@@ -32,6 +34,15 @@ const obterPedidoUsuario = async (param_usuario) => {
 
 }
 
+const obterPedidoUsuarioV2 = async (param_usuario) => {
+
+    // obter o pedido com a pizza do usuário
+    const pedido = await Pedido.findOne({usuario: param_usuario}).populate("pizza").exec();
+    console.log(pedido);
+    return pedido;
+
+}
+
 mongoose.connect(uri).then(async (conn) => {
 
     const p1 = new Pizza({nome: 'Atum com Queijo', preco: 23.0});
@@ -41,13 +52,25 @@ mongoose.connect(uri).then(async (conn) => {
     const p3 = new Pizza({nome: 'Picanha com Alho', preco: 30.0});
     //await p3.save();
 
+    // Criar um pedido com 2 pizzas
+    const pedido_p1 = await Pizza.findOne({nome: 'Atum com Queijo'});
+    const pedido_p2 = await Pizza.findOne({nome: 'Picanha com Alho'});
+
+    const pd2 = new Pedido({usuario: "esensato", 
+                            pizza: [pedido_p1, pedido_p2], 
+                            endereco: 'Rua X', 
+                            quantidade: 1});
+
     const pd1 = new Pedido({usuario: "esensato", 
                             pizza: new mongoose.Types.ObjectId('641106f57c31ba8b9bf6fe04'), 
                             endereco: 'Rua X', 
                             quantidade: 1});
     //await pd1.save();
 
-    const resultado = await obterPedidoUsuario("esensato");
+    //await pd2.save();
+
+    //const resultado = await obterPedidoUsuario("esensato");
+    const resultado = await obterPedidoUsuarioV2("esensato");
     console.log(resultado);
 
     console.log('Fim');

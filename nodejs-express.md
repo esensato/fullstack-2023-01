@@ -274,6 +274,9 @@ app.get("/json", (req, res, next) => {
 
     app.use(alunoRouter)
   ```
+  - Outra opção
+
+    `app.use('/api/v1', alunoRouter)`
 
   ### Exercício
 

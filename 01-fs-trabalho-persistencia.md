@@ -21,4 +21,4 @@ A cada quantidade de material reciclado são atribuídos pontos que podem ser tr
 - Implementar funções para Criação, Atualização, Recuperação e Exclusão (CRUD) para cada objeto do diagrama acima
 - Na função de Criação retornar o objeto recém criado
 - A função de recuperação deve obter um objeto por meio de seu `_id`
-- A função de Atualização e Exclusão devem realizar a operação pelo `_id` do objeto e verificar antes se o id é valido ou não
+- A função de Atualização e Exclusão devem realizar a operação pelo `_id` do objeto verificando se o objeto existe (pelo `_id` informado) antes de atualizar ou excluir

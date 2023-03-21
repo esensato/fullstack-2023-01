@@ -232,8 +232,6 @@ for (let erro in validacao.errors) {
 - Arquivo `mensagem.js` com a constante `mensagem` privada
     ```
     const mensagem = "Boa noite!";
-
-    module.exports.mensagem = mensagem;
     ```
 - Ao importar e exibir o conteúdo de `mensagem` em outro módulo:
 

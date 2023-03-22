@@ -14,13 +14,17 @@ const emprestar = async (livroId) => {
             emprestimo = await emprestimo.save({session: session});
             livro.emprestimo.push(emprestimo);
             await livro.save({session: session});
-            session.commitTransaction();
+            await session.commitTransaction();
             return emprestimo;
         }
         
     } catch (error) {
         console.log(error);
         session.abortTransaction();
+    } finally {
+        if (session) {
+            session.endSession();
+        }
     }
 
 }

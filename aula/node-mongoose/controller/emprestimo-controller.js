@@ -11,12 +11,13 @@ const emprestar = async (livroId) => {
         const livro = await Livro.findById(livroId).exec();
         if (livro) {
             let emprestimo = new Emprestimo({livro: livro, data: new Date()});
-            emprestimo = await emprestimo.save();
+            emprestimo = await emprestimo.save({session: session});
             livro.emprestimo.push(emprestimo);
-            await livro.save();
+            await livro.save({session: session});
             session.commitTransaction();
             return emprestimo;
         }
+        
     } catch (error) {
         console.log(error);
         session.abortTransaction();

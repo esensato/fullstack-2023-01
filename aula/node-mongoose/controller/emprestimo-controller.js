@@ -21,10 +21,6 @@ const emprestar = async (livroId) => {
     } catch (error) {
         console.log(error);
         session.abortTransaction();
-    } finally {
-        if (session) {
-            session.endSession();
-        }
     }
 
 }

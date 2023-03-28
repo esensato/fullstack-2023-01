@@ -388,9 +388,10 @@ emprestimos: [{type: mongoose.Types.ObjectId, required: true, ref: 'Emprestimo'}
 ```
 const emprestarLivro = async (livro, usuario, data) => {
 
+    let session;
     try {
 
-        const session = await mongoose.startSession();
+        session = await mongoose.startSession();
         session.startTransaction();
         const emprestimo = new Emprestimo({data: data, livro: livro, usuario: usuario});
         await emprestimo.save({session: session});
@@ -401,6 +402,11 @@ const emprestarLivro = async (livro, usuario, data) => {
 
     } catch (err) {
         console.log(err);
+        await session.abortTransaction();
+    } finally {
+        if (session) {
+            await session.endSession();
+        }
     }
 }
 ```
@@ -445,13 +451,3 @@ const devolucaoLivro = async (usuario, titulo) => {
 
 }
 ```
-
-### Exercício
-- Implementar uma funcionalidade de gestão de usuários contemplando:
-    - Possibilidade de criar um novo usuário contendo nome, username, senha e email (todos os campos devem ser obrigatórios)
-    - Validar o login e senha
-    - Permitir a alteração da senha
-    - Gravar um histórico de acessos do usuário contendo a data de login e um indicador (true / false) se a senha foi digitada corretamente
-    - Criar um indicador (true / false) e uma quantidade de logins com falha no usuário
-    - Bloquear o usuário caso o total de logins com falha seja maior ou igual a 3
-    - Implementar uma funcionalidade que permita o desbloqueio de um usuário por um usuário do tipo administrador (criar um indicador para usuários administradores)

@@ -62,6 +62,7 @@ npm run version
 var http = require('http');
 
 http.createServer(function (req, res) {
+  console.log(JSON.stringify(req.headers))
   console.log(req.method);
   console.log(req.url);
   res.write('Hello World!');
@@ -112,6 +113,11 @@ const app = express();
 app.listen(3000, () => console.log("Servidor iniciado!"))
 ```
 
+### Mode de DEBUG
+- Para ativar o modo de depuração com mensagens detalhadas sobre a execução do **express** basta definir uma variável de ambiente:
+  - `export DEBUG=express:*` (mac / linux)
+  - `set DEBUG=express:*` (windows)
+ 
 ### Middleware
 
 - *Middleware* são bibliotecas que podem ser executadas a cada requisição ao servidor para realizar algum tipo de processamento sobre os valores de entrada e produzir desejados na saída
@@ -170,26 +176,39 @@ app.use((req, res, next) => {
 
 app.listen(3000, () => console.log("Servidor iniciado!"))
 ```
+### Verbos HTTP
+- O protocolo HTTP prevê várias ações (verbos) requisitadas entre o cliente e o servidor
+  - **GET** - quando queremos obter um recurso: `GET /filme/123` (obter o filme com id 123)
+  - **POST** - para criar um novo recurso (os dados são enviados no corpo da requisição)
+  - **PUT** - alterar um recurso: `PUT /filme/123` (atualizar o filme com o id 123 com os dados enviados no corpo da requisição)
+  - **DELETE** - remover um recurso do servidor: `DELETE /filme/123` (remover o filme com id 123)
 
 ### Mapeando Requisições GET
 
-```
-const express = require('express');
+  ```
+  const express = require('express');
 
-const app = express();
+  const app = express();
 
-app.get("/frase", (req, res, next) => {
+  app.get("/frase", (req, res, next) => {
 
-    const nome = req.query.nome;
+      const nome = req.query.nome;
 
-    console.log(req.params)
-    res.send("Boa noite " + nome);
+      console.log(req.params)
+      res.send("Boa noite " + nome);
 
-});
+  });
 
-app.listen(3000, () => console.log("Servidor iniciado!"))
-```
+  app.listen(3000, () => console.log("Servidor iniciado!"))
+  ```
+- Obs: pode-se utilizar um "*" para mapear qualquer rota que não se enquadre nas mapeadas:
+  ```
+  app.get("*", (req, res, next) => {
 
+      res.send("Requisição inválida");
+
+  });
+  ```
 ### Lendo Parâmetros da URL
 
 ```
@@ -249,6 +268,105 @@ app.get("/json", (req, res, next) => {
 });
 ```
 
+### Tratamento de Erros
+
+- **HTTP** possui uma série de códigos de erro que podem ser mapeados para o **RESTFul**
+- [HTTP Status](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
+- Esses códigos podem ser utilizados, por exemplo:
+  - 200 - requisição e resposta realizados com sucesso
+  - 404 - recursos não localizado (por exemplo, em uma busca por id)
+  - 401 - usuário não atuorizado a realizar a operação
+  - 400 - requisição mau formulada (por exemplo, falta de um parâmetro)
+- Em **express** o código de erro pode ser enviado por meio da função `status`
+`res.status(401).send('Usuário ou senha inválidos!');`
+
+### Arquivos Estáticos
+- É possível mapear uma pasta para retornar arquivos estáticos como imagens, por exemplo
+  `app.use(express.static('./publico'))`
+- Todo arquivo dentro do diretório `publico` poderá ser acessado via requisição
+
+### Cookies
+- Para trabalhar com cookies 
+`npm install --save cookie-parse`
+
+  ```
+  const bodyParser = require('body-parser');
+  app.use(cookieParser())
+  app.get("/cookie", (req, res, next) => {
+      console.log(req.cookies);
+      res.cookie('name', 'express');
+      res.send('cookie set'); 
+  })
+  ```
+### Sessions
+
+`npm install --save express-session`
+
+```
+var session = require('express-session');
+app.use(session());
+app.get('/contador', function(req, res){
+   if(req.session.page_views){
+      req.session.page_views++;
+      res.send("Total " + req.session.page_views);
+   } else {
+      req.session.page_views = 1;
+      res.send("Bem vindo! Primeiro acesso!!!");
+   }
+});
+```
+
+### Upload de Arquivos
+
+- Instalar o pacote **fileupload**
+`npm install --save express-fileupload`
+- Criar uma página estática **HTML** dentro do diretório definido como público
+  ```
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>Upload de Arquivo</title>
+    </head>
+    <body>
+      <h1>Selecione o arquivo</h1>
+      <form method="POST" action="/upload" enctype="multipart/form-data">
+        <input type="file" name="arquivo" />
+        <input type="submit" />
+      </form>
+    </body>
+  </html>
+  ```
+
+- Efetuar as importações necessárias
+  ```
+  const fileUpload = require("express-fileupload");
+  const path = require("path");
+  ```
+- Iniciar o **middleware**
+`app.use(fileUpload());`
+- Código para efetuar o upload e mover o arquivo para uma pasta:
+
+  ```
+  app.post("/upload", (req, res) => {
+      if (!req.files) {
+          return res.status(400).send("Nenhum arquivo para upload.");
+        }
+      
+      const file = req.files.arquivo;
+
+      // __dirname representa o diretório atual
+      const path = __dirname + "/files/" + file.name;
+          // mv move um arquivo de diretório
+          file.mv(path, (err) => {
+              if (err) {
+                return res.status(500).send(err);
+              }
+              return res.send({ status: "Sucesso!!!", path: path });
+          });
+    });
+  ```
+
+
 ### Rotas
 
 - Uma forma de organiar os vários tipos de requisições por objeto de negócio é a criação de rotas
@@ -278,7 +396,33 @@ app.get("/json", (req, res, next) => {
 
     `app.use('/api/v1', alunoRouter)`
 
-  ### Exercício
+### Exercício
 
-  - Criar uma nota rota para exibir todas as disciplinas (`curso/disciplinas`) de um curso
-
+- Para o exercício abaixo não é necessário implementar a camada de persistência
+- Utilizar uma estrutura de **hashmap** para armazenar os dados. Exemplo:
+  ```
+  var usuarios = [];
+  usuarios['joao'] = {username: 'joao', 
+                      senha: '123', 
+                      totalfalhalogin: 0, 
+                      admin: false, 
+                      bloqueado: false};
+  // exemplo para trocar a senha
+  usuarios['joao'].senha='teste123'
+  console.log(usuarios);
+  console.log(usuarios['joao'].username);
+  console.log(usuarios['joao'].senha);
+  ```
+- Implementar uma funcionalidade de gestão de usuários contemplando:
+    - Possibilidade de criar um novo usuário contendo nome, username e senha
+    - Validar o login e senha
+    - Permitir a alteração da senha
+    - Gravar um histórico de acessos do usuário contendo a data de login e um indicador (true / false) se a senha foi digitada corretamente
+    ```
+    var acessos = [];
+    acessos.push({usuario: 'joao', data: new Date(), valido: true})
+    console.log(acessos)
+    ```
+    - Criar um indicador (true / false) e uma quantidade de logins com falha no usuário
+    - Bloquear o usuário caso o total de logins com falha seja maior ou igual a 3
+    - Implementar uma funcionalidade que permita o desbloqueio de um usuário por um usuário do tipo administrador

@@ -103,6 +103,10 @@ http.createServer(function (req, res) {
 
 `nodemon`
 
+- Obs: caso não seja localizado, executar (Windows):
+
+`node node_modules\nodemon\bin\nodemon.js`
+
 ### Iniciando o Servidor
 
 ```

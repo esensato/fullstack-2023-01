@@ -196,10 +196,7 @@ app.listen(3000, () => console.log("Servidor iniciado!"))
 
   app.get("/frase", (req, res, next) => {
 
-      const nome = req.query.nome;
-
-      console.log(req.params)
-      res.send("Boa noite " + nome);
+      res.send("Boa noite !");
 
   });
 
@@ -215,20 +212,21 @@ app.listen(3000, () => console.log("Servidor iniciado!"))
   ```
 ### Lendo Parâmetros da URL
 
+- Pelos parâmetros passados na URL após o "?"
 ```
-const express = require('express');
-const app = express();
-
-app.get("/frase", (req, res, next) => {
-
-    const nome = req.query.nome;
-
-    console.log(req.params)
-    res.send("Boa noite " + nome);
-
+app.get("/filme", (req, res) => {
+    console.log(req.query)
+    res.send(req.query);
 });
 
-app.listen(3000, () => console.log("Servidor iniciado!"))
+```
+- Criando parâmetros posicionais
+```
+app.get("/filme/:id", (req, res) => {
+    console.log(req.params.id)
+    res.send(req.params.id);
+});
+
 ```
 
 ### Mapeando Requisições POST

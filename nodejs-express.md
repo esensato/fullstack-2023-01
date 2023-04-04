@@ -430,6 +430,45 @@ app.get('/contador', function(req, res){
 [Open API](https://swagger.io/specification/)
 
 [Swagger Editor](https://editor.swagger.io/)
+
+- Exemplo:
+
+```yaml
+openapi: 3.0.9
+info:
+  title: Meus Endpoints
+  version: '1.0'
+servers:
+  - url: http://localhost:9000
+components:
+  schemas:
+    Filme:
+      type: object
+      properties:
+        id:
+          type: string
+        titulo:
+          type: string
+paths:
+  /cinema/filme:
+    post:
+      operationId: criarFilme
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Filme'
+      responses:
+        '200':
+          description: Filme criado com sucesso!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+```
 ** 
 #### Criptografando Senhas
 - Uma das opções é utilizar o módulo `bcryptjs`

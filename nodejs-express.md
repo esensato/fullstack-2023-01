@@ -9,7 +9,7 @@
 
 ### Executando runtime
 
-```
+```bash
 node
 console.log('Teste');
 .exit
@@ -17,7 +17,7 @@ console.log('Teste');
 
 ### Acessando Arquivos
 
-```
+```javascript
 const fs = require('fs');
 fs.writeFileSync('arquivo.txt', 'Teste 123');
 ```
@@ -29,7 +29,7 @@ fs.writeFileSync('arquivo.txt', 'Teste 123');
 - Iniciar o projeto (`npm init -y`)
 
 ### Scripts de Execução
-```
+```json
 {
   "name": "teste-express",
   "version": "1.0.0",
@@ -58,7 +58,7 @@ npm run version
 
 - Utilizar o módulo padrão `http` (não precisa ser instalado)
 
-```
+```javascript
 var http = require('http');
 
 http.createServer(function (req, res) {
@@ -72,7 +72,7 @@ http.createServer(function (req, res) {
 
 - Processando uma requisição POST
 
-```
+```javascript
 http.createServer(function (req, res) {
   console.log(req.method);
   let corpo = "";
@@ -109,7 +109,7 @@ http.createServer(function (req, res) {
 
 ### Iniciando o Servidor
 
-```
+```javascript
 const express = require('express');
 
 const app = express();
@@ -128,7 +128,7 @@ app.listen(3000, () => console.log("Servidor iniciado!"))
 
 - Para aplicar um *middleware* basta utilizar o `use`
 
-```
+```javascript
 app.use((req, res, next) => {
 
     res.send("Teste ok!");
@@ -142,7 +142,7 @@ app.use((req, res, next) => {
 
 - O *next* salta para a próxima unidade de processamento sem gerar resposta ao usuário
 
-```
+```javascript
 const express = require('express');
 
 const app = express();
@@ -189,7 +189,7 @@ app.listen(3000, () => console.log("Servidor iniciado!"))
 
 ### Mapeando Requisições GET
 
-  ```
+  ```javascript
   const express = require('express');
 
   const app = express();
@@ -203,7 +203,7 @@ app.listen(3000, () => console.log("Servidor iniciado!"))
   app.listen(3000, () => console.log("Servidor iniciado!"))
   ```
 - Obs: pode-se utilizar um "*" para mapear qualquer rota que não se enquadre nas mapeadas:
-  ```
+  ```javascript
   app.get("*", (req, res, next) => {
 
       res.send("Requisição inválida");
@@ -213,7 +213,7 @@ app.listen(3000, () => console.log("Servidor iniciado!"))
 ### Lendo Parâmetros da URL
 
 - Pelos parâmetros passados na URL após o "?"
-```
+```javascript
 app.get("/filme", (req, res) => {
     console.log(req.query)
     res.send(req.query);
@@ -221,7 +221,7 @@ app.get("/filme", (req, res) => {
 
 ```
 - Criando parâmetros posicionais
-```
+```javascript
 app.get("/filme/:id", (req, res) => {
     console.log(req.params.id)
     res.send(req.params.id);
@@ -233,7 +233,7 @@ app.get("/filme/:id", (req, res) => {
 
 - Alterar o código para retornar um formulário `from` contendo `username` e `senha`
 
-```
+```javascript
 app.get("/", (req, res, next) => {
 
     res.send('<form method="POST" action="login">Username:<input type="text" name="username">Senha:<input type="password" name="senha"><button type="submit>Login</button>');
@@ -249,7 +249,7 @@ app.get("/", (req, res, next) => {
 
 `npm install --save body-parser  --loglevel=error`
 
-```
+```javascript
 const bodyParser = require('body-parser');
 
 app.use(bodyParser.urlencoded({extended: false}))
@@ -262,7 +262,7 @@ app.use(bodyParser.urlencoded({extended: false}))
 
 - *Express* oferece um método prático para converter dados para objetos JSON
 
-```
+```javascript
 app.get("/json", (req, res, next) => {
 
     res.json({mensagem: 'Hello'});
@@ -291,7 +291,7 @@ app.get("/json", (req, res, next) => {
 - Para trabalhar com cookies 
 `npm install --save cookie-parse`
 
-  ```
+  ```javascript
   const bodyParser = require('body-parser');
   app.use(cookieParser())
   app.get("/cookie", (req, res, next) => {
@@ -304,7 +304,7 @@ app.get("/json", (req, res, next) => {
 
 `npm install --save express-session`
 
-```
+```javascript
 var session = require('express-session');
 app.use(session());
 app.get('/contador', function(req, res){
@@ -323,7 +323,7 @@ app.get('/contador', function(req, res){
 - Instalar o pacote **fileupload**
 `npm install --save express-fileupload`
 - Criar uma página estática **HTML** dentro do diretório definido como público
-  ```
+  ```HTML
   <!DOCTYPE html>
   <html>
     <head>
@@ -348,7 +348,7 @@ app.get('/contador', function(req, res){
 `app.use(fileUpload());`
 - Código para efetuar o upload e mover o arquivo para uma pasta:
 
-  ```
+  ```javascript
   app.post("/upload", (req, res) => {
       if (!req.files) {
           return res.status(400).send("Nenhum arquivo para upload.");
@@ -367,15 +367,13 @@ app.get('/contador', function(req, res){
           });
     });
   ```
-
-
 ### Rotas
 
 - Uma forma de organiar os vários tipos de requisições por objeto de negócio é a criação de rotas
 - O objeto `Router()` implementa o conceito de rotas no *express*
 - Criar uma pasta `routes` no projeto
 - Dentro desta pasta, criar os arquivos (`js`) de rota para cada objeto de negócio
-  ```
+  ```javascript
   const express = require('express');
 
   const router = express.Router();
@@ -389,9 +387,8 @@ app.get('/contador', function(req, res){
 
   - Para registrar a rota na aplicação principal
 
-    ```
+    ```javascript
     const alunoRouter = require("./routes/aluno-route");
-
     app.use(alunoRouter)
   ```
   - Outra opção
@@ -399,10 +396,9 @@ app.get('/contador', function(req, res){
     `app.use('/api/v1', alunoRouter)`
 
 ### Exercício
-
 - Para o exercício abaixo não é necessário implementar a camada de persistência
 - Utilizar uma estrutura de **hashmap** para armazenar os dados. Exemplo:
-  ```
+  ```javascript
   var usuarios = [];
   usuarios['joao'] = {username: 'joao', 
                       senha: '123', 
@@ -420,7 +416,7 @@ app.get('/contador', function(req, res){
     - Validar o login e senha
     - Permitir a alteração da senha
     - Gravar um histórico de acessos do usuário contendo a data de login e um indicador (true / false) se a senha foi digitada corretamente
-    ```
+    ```javascript
     var acessos = [];
     acessos.push({usuario: 'joao', data: new Date(), valido: true})
     console.log(acessos)
@@ -428,3 +424,38 @@ app.get('/contador', function(req, res){
     - Criar um indicador (true / false) e uma quantidade de logins com falha no usuário
     - Bloquear o usuário caso o total de logins com falha seja maior ou igual a 3
     - Implementar uma funcionalidade que permita o desbloqueio de um usuário por um usuário do tipo administrador
+**
+### Documentando Endpoints
+
+[Open API](https://swagger.io/specification/)
+
+[Swagger Editor](https://editor.swagger.io/)
+** 
+#### Criptografando Senhas
+- Uma das opções é utilizar o módulo `bcryptjs`
+- `npm install --save bcryptjs`
+- Para criptografar e comparar:
+
+```javascript
+const bcryptjs = require('bcryptjs');
+
+const hash = bcryptjs.hashSync("teste", 12);
+console.log(hash);
+console.log(bcryptjs.compareSync("teste", hash));
+console.log(bcryptjs.compareSync("teste2", hash)) 
+```
+- Melhorar a parte de login acima implementando criptografia
+
+#### JWT (JSON Web Token)
+
+- [Especificação](https://jwt.io/)
+
+`npm install --save jsonwebtoken`
+
+  ```javascript
+  const jwt = require('jsonwebtoken');
+const token = jwt.sign({username: 'teste', emal: 'teste@teste.com'}, "chavesecreta");
+console.log(token);
+const decoded = jwt.verify(token, "chavesecreta");
+console.log(decoded);
+  ```

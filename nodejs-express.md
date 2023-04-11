@@ -257,7 +257,7 @@ app.use(bodyParser.urlencoded({extended: false}))
 ```
 
 - Outos tipos de requisições HTTP: `delete` (excluir algo), `put` (alterar algo)
-
+***
 ### Retornando Objetos JSON
 
 - *Express* oferece um método prático para converter dados para objetos JSON
@@ -269,7 +269,7 @@ app.get("/json", (req, res, next) => {
 
 });
 ```
-
+***
 ### Tratamento de Erros
 
 - **HTTP** possui uma série de códigos de erro que podem ser mapeados para o **RESTFul**
@@ -281,7 +281,7 @@ app.get("/json", (req, res, next) => {
   - 400 - requisição mau formulada (por exemplo, falta de um parâmetro)
 - Em **express** o código de erro pode ser enviado por meio da função `status`
 `res.status(401).send('Usuário ou senha inválidos!');`
-
+***
 ### Arquivos Estáticos
 - É possível mapear uma pasta para retornar arquivos estáticos como imagens, por exemplo
   `app.use(express.static('./publico'))`
@@ -289,17 +289,18 @@ app.get("/json", (req, res, next) => {
 
 ### Cookies
 - Para trabalhar com cookies 
-`npm install --save cookie-parse`
+`npm install --save cookie-parser`
 
   ```javascript
-  const bodyParser = require('body-parser');
-  app.use(cookieParser())
+  const cookieParser = require('cookie-parser');
+  app.use(cookieParser)
   app.get("/cookie", (req, res, next) => {
       console.log(req.cookies);
       res.cookie('name', 'express');
       res.send('cookie set'); 
   })
   ```
+***
 ### Sessions
 
 `npm install --save express-session`
@@ -317,7 +318,7 @@ app.get('/contador', function(req, res){
    }
 });
 ```
-
+***
 ### Upload de Arquivos
 
 - Instalar o pacote **fileupload**
@@ -367,6 +368,7 @@ app.get('/contador', function(req, res){
           });
     });
   ```
+***
 ### Rotas
 
 - Uma forma de organiar os vários tipos de requisições por objeto de negócio é a criação de rotas
@@ -394,7 +396,7 @@ app.get('/contador', function(req, res){
   - Outra opção
 
     `app.use('/api/v1', alunoRouter)`
-
+***
 ### Exercício
 - Para o exercício abaixo não é necessário implementar a camada de persistência
 - Utilizar uma estrutura de **hashmap** para armazenar os dados. Exemplo:
@@ -411,6 +413,7 @@ app.get('/contador', function(req, res){
   console.log(usuarios['joao'].username);
   console.log(usuarios['joao'].senha);
   ```
+- Opcional - utilizar o [glitch](https://glitch.com/) para desenvolver os endpoints
 - Implementar uma funcionalidade de gestão de usuários contemplando:
     - Possibilidade de criar um novo usuário contendo nome, username e senha
     - Validar o login e senha
@@ -421,10 +424,9 @@ app.get('/contador', function(req, res){
     acessos.push({usuario: 'joao', data: new Date(), valido: true})
     console.log(acessos)
     ```
-    - Criar um indicador (true / false) e uma quantidade de logins com falha no usuário
     - Bloquear o usuário caso o total de logins com falha seja maior ou igual a 3
     - Implementar uma funcionalidade que permita o desbloqueio de um usuário por um usuário do tipo administrador
-**
+***
 ### Documentando Endpoints
 
 [Open API](https://swagger.io/specification/)
@@ -469,7 +471,7 @@ paths:
                   id:
                     type: string
 ```
-** 
+***
 #### Criptografando Senhas
 - Uma das opções é utilizar o módulo `bcryptjs`
 - `npm install --save bcryptjs`
@@ -484,7 +486,7 @@ console.log(bcryptjs.compareSync("teste", hash));
 console.log(bcryptjs.compareSync("teste2", hash)) 
 ```
 - Melhorar a parte de login acima implementando criptografia
-
+***
 #### JWT (JSON Web Token)
 
 - [Especificação](https://jwt.io/)
@@ -493,8 +495,36 @@ console.log(bcryptjs.compareSync("teste2", hash))
 
   ```javascript
   const jwt = require('jsonwebtoken');
-const token = jwt.sign({username: 'teste', emal: 'teste@teste.com'}, "chavesecreta");
-console.log(token);
-const decoded = jwt.verify(token, "chavesecreta");
-console.log(decoded);
+  const token = jwt.sign({username: 'teste', emal: 'teste@teste.com'}, "chavesecreta");
+  console.log(token);
+  const decoded = jwt.verify(token, "chavesecreta");
+  console.log(decoded);
   ```
+- O token deve ser obtido antes de uma requisição ao endpoint
+- As próximas requisições devem enviar o token no header
+
+  ```javascript
+  const authHeader = req.headers["authorization"]
+  const token = authHeader.split(" ")[1]
+  ```
+***
+#### Conectando MongoDB com Express via Mongoose
+
+- Instalar o `mongoose`
+
+`npm install --save mongoose`
+
+- Código exemplo que deve ser criado no arquivo principal:
+  ```javascript
+  const mongoose = require('mongoose');
+  const express = require('express');
+
+  const app = express();
+
+  mongoose.connect(URL)
+          .then(() => {
+            app.listen(3000, () => console.log("Servidor iniciado!"))
+          })
+          .catch (err => console.log(err);
+  ```
+  - Implementar a criação de usuário com conexão com o **mongodb**

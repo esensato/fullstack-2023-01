@@ -1,20 +1,48 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const uploadRoute = require('./routes/upload');
 
 const app = express();
 
 app.use(bodyParser.urlencoded({extended: false}));
+app.use(cookieParser());
+app.use(session({ secret: 'keyboard cat'}));
+app.use(express.static('./img'));
+
+app.use(uploadRoute);
+
+app.get("/contador", (req, res) => {
+    if(req.session.page_views){
+        req.session.page_views++;
+        res.send("Total " + req.session.page_views);
+     } else {
+        req.session.page_views = 1;
+        res.send("Bem vindo! Primeiro acesso!!!");
+     }
+})
 
 app.get("/form", (req, res, next) => {
-    // POST em http://localhost:9000/login
-    res.send('<form method="POST" action="login">Username:<input type="text" name="username">Senha:<input type="password" name="senha"><button type="submit">Login</button>');
+    if (req.cookies.username != null) {
+        res.send('Login OK!!!');
+    } else {
+        // POST em http://localhost:9000/login
+        res.send('<form method="POST" action="login">Username:<input type="text" name="username">Senha:<input type="password" name="senha"><button type="submit">Login</button>');
+    }
 });
 
 app.post("/login", (req, res) => {
-    if (req.body.username === 'teste' && req.body.senha === '123') {
-        res.send('Login OK!!!!');
+    console.log(req.cookies);
+    console.log(req.body.username);
+    console.log(req.body.senha);
+
+    if (req.cookies.username != null || 
+        (req.body.username === 'teste' && req.body.senha === '123')) {
+        res.cookie('username', req.body.username);
+        res.status(200).send('Login OK!!!!');
     } else {
-        res.send('Username ou senha invalidos!');
+        res.status(401).json({erro: 'Username ou senha invalidos!'});
     }
 })
 
@@ -31,21 +59,6 @@ app.get("/ator", (req, res) => {
         res.send("Informar o parametro nacionalidade!");
 
     }
-});
-
-var msg = "";
-
-app.use((req, res, next) => {
-
-    msg = "Boa ";
-    next();
-
-});
-
-app.use((req, res, next) => {
-    msg += "Noite!"
-    res.send("<h1>"+ msg + "</h1>");
-
 });
 
 app.listen(9000, ()=>{

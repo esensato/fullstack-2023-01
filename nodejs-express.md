@@ -278,7 +278,7 @@ app.get("/json", (req, res, next) => {
   - 200 - requisição e resposta realizados com sucesso
   - 404 - recursos não localizado (por exemplo, em uma busca por id)
   - 401 - usuário não atuorizado a realizar a operação
-  - 400 - requisição mau formulada (por exemplo, falta de um parâmetro)
+  - 400 - requisição mal formulada (por exemplo, falta de um parâmetro)
 - Em **express** o código de erro pode ser enviado por meio da função `status`
 `res.status(401).send('Usuário ou senha inválidos!');`
 ***
@@ -490,30 +490,53 @@ console.log(bcryptjs.compareSync("teste2", hash))
 #### JWT (JSON Web Token)
 
 - [Especificação](https://jwt.io/)
-
+- Funcionamento básico:
+  - Usuário se autentica
+  - Se autenticação válida, gera um **token**
+  - Próximas requisições enviam o **token** no *header* da requisição
+- Instalação
 `npm install --save jsonwebtoken`
-
+- Exemplo
   ```javascript
   const jwt = require('jsonwebtoken');
-  const token = jwt.sign({username: 'teste', emal: 'teste@teste.com'}, "chavesecreta");
+  // criar a variável de ambiente SECRET com a chave secreata
+  const token = jwt.sign({username: 'teste', emal: 'teste@teste.com'}, process.env.SECRET, { expiresIn: '1800s' });
   console.log(token);
-  const decoded = jwt.verify(token, "chavesecreta");
+  const decoded = jwt.verify(token, process.env.SECRET);
   console.log(decoded);
   ```
-- O token deve ser obtido antes de uma requisição ao endpoint
-- As próximas requisições devem enviar o token no header
-
+- Recebendo a requisição no *header*
   ```javascript
   const authHeader = req.headers["authorization"]
   const token = authHeader.split(" ")[1]
+  ``` 
+***
+#### Express Validator
+- Framework para validação de dados disponível no **Express**
+- [Validator](https://express-validator.github.io)
+`npm install --save express-validator`
+- Importar o tipo de validação `body`, `query` ou `param`
+`const { body, validationResult, matchedData } = require('express-validator');`
+- Para efetuar as validações:
+  ```javascript
+    router.post('/usuario/login/', body('username').notEmpty().isEmail().withMessage('E-mail invalido!'), body('senha').isNumeric(), (req, res) => {
+      let validacao = validationResult(req).array();
+      if (validacao.length === 0) {
+        // dados validados
+        const data = matchedData(req);
+        if (usuarioController.login(data.username, data.senha)) {
+            res.json({resultado: 'Login OK!'});
+        } else res.status(401).json({resultado: 'Usuário / senha inválidos!'});
+      } else {
+        res.status(401).json(validacao);
+      }
+  });
   ```
+
 ***
 #### Conectando MongoDB com Express via Mongoose
-
 - Instalar o `mongoose`
-
-`npm install --save mongoose`
-
+  `npm install --save mongoose`
 - Código exemplo que deve ser criado no arquivo principal:
   ```javascript
   const mongoose = require('mongoose');

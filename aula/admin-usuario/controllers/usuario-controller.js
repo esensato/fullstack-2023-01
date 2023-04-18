@@ -32,12 +32,6 @@ const alterarSenha = (username, novaSenha) => {
     }
 }
 
-novoUsuario('user1', '123')
-novoUsuario('user2', '456')
-console.log(usuarios['user1'].senha);
-console.log(login('user1', '123'));
-console.log(login('user1', '124'));
-
 module.exports.novoUsuario = novoUsuario;
 module.exports.login = login;
 module.exports.alterarSenha = alterarSenha;

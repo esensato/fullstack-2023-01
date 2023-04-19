@@ -1,9 +1,12 @@
+const bcryptjs = require('bcryptjs');
+const jsonwebtoken = require('jsonwebtoken');
+
 var usuarios = [];
 
 const novoUsuario = (username, senha) => {
     usuarios[username] = {
         username: username,
-        senha: senha,
+        senha: bcryptjs.hashSync(senha),
         bloqueado: false,
         totalFalhaLogin: 0,
         admin: false
@@ -15,9 +18,13 @@ const novoUsuario = (username, senha) => {
 // retorna true caso username / senha válidos ou false caso contrário
 const login = (username, senha) => {
     if (usuarios[username]) {
-        return usuarios[username].senha === senha;
+        const valido = bcryptjs.compareSync(senha, usuarios[username].senha);
+        if (valido) {
+            const token = jsonwebtoken.sign({username: username}, process.env.SEGREDO);
+            return {valido: true, token: token};
+        } else return {valido: false};
     } else {
-        return false;
+        return {valido: false};
     }
 }
 

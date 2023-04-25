@@ -532,7 +532,15 @@ console.log(bcryptjs.compareSync("teste2", hash))
       }
   });
   ```
-
+***
+#### Lidando Com Endpoints Inexistentes (404)
+- Adicionar como último *endpoint*
+```javascript
+// 404 error
+app.use((req, res) => {
+  res.status(404).json({msg: "Endpoint inválido!"});
+});
+```
 ***
 #### Conectando MongoDB com Express via Mongoose
 - Instalar o `mongoose`

@@ -38,4 +38,4 @@ Utilizando o trabalho anterior como base, criar a camada de serviços para que u
   - 400 - requisição mal formulada (por exemplo, falta de um parâmetro)
 
 - Para as rotas *premio* e *reciclagem* verificar a existência do **token** gerado no **endpoint** `/usuario/login`. Caso não exista, retornar 401
-- Documentar os **endpoints** utilizando o padrão **OpenAPI / swagger** 
+- Documentar os **endpoints** `/usuario` (POST) e `/reciclagem/{id}` (GET) utilizando o padrão **OpenAPI / swagger** 

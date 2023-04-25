@@ -514,8 +514,11 @@ console.log(bcryptjs.compareSync("teste2", hash))
 #### Express Validator
 - Framework para validação de dados disponível no **Express**
 - [Validator](https://express-validator.github.io)
+- Instalação
+
 `npm install --save express-validator`
 - Importar o tipo de validação `body`, `query` ou `param`
+
 `const { body, validationResult, matchedData } = require('express-validator');`
 - Para efetuar as validações:
   ```javascript

@@ -3,16 +3,26 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const usuarioController = require("../controllers/usuario-controller");
 const jsonwebtoken = require('jsonwebtoken');
+const { body, validationResult, matchedData } = require('express-validator');
 const router = express.Router();
 
 // habilita o tratamento de requisições no formato JSON
 router.use(bodyParser.json())
 
 // cria um novo usuario
-router.post('/usuario', (req, res) => {
-    const novo = usuarioController.novoUsuario(req.body.username, req.body.senha);
-    res.json({resultado: 'Usuário criado!', usuario: novo});
-})
+router.post('/usuario', 
+    body('username').notEmpty().isEmail().withMessage("Username inválido"),
+    body('senha').isNumeric().withMessage("A senha deve conter apenas números"),
+    async (req, res) => {
+        console.log(matchedData(req));
+        const validacao = validationResult(req).array();
+        if (validacao.length === 0) {
+            const novo = await usuarioController.novoUsuario(req.body.username, req.body.senha);
+            res.json({resultado: 'Usuário criado!', usuario: novo});    
+        } else {
+            res.status(401).json(validacao);
+        }
+    })
 
 // Validar o login e senha
 router.post('/usuario/login/', (req, res) => {

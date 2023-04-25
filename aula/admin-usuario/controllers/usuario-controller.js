@@ -1,17 +1,29 @@
 const bcryptjs = require('bcryptjs');
 const jsonwebtoken = require('jsonwebtoken');
+const mongoose = require('mongoose');
+
+const usuarioSchema = new mongoose.Schema({
+    username: String,
+    senha: String,
+    bloqueado: Boolean,
+    totalFalhaLogin: Number,
+    admin: Boolean
+    });
+
+const Usuario = mongoose.model('Usuario', usuarioSchema);
 
 var usuarios = [];
-
-const novoUsuario = (username, senha) => {
-    usuarios[username] = {
+// persiste no banco de dados
+const novoUsuario = async (username, senha) => {
+    const usuario = new Usuario({
         username: username,
         senha: bcryptjs.hashSync(senha),
         bloqueado: false,
         totalFalhaLogin: 0,
         admin: false
-    }
-    return usuarios[username];
+    });
+    const ret = await usuario.save();
+    return ret;
 }
 
 // criar uma função que valida usuario e senha

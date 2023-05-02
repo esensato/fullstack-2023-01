@@ -17,7 +17,7 @@
     </html>
     ```
 - Criar um `<div>` com um **id** **root** onde a interface será exibida
-    ```javascript
+    ```html
     <html>
         <header>
             <script src="https://fb.me/react-0.14.3.js"></script>
@@ -92,6 +92,17 @@
 ***
 ## Componentes
 - React é baseado fortemente em componentes
+- Componentes podem ser criados por meio de funções ou classes
+    ```javascript
+    class Alo extends React.Component {
+    constructor() {
+        super();
+    }
+    render() {
+        return <h2>Boa Noite!</h2>;
+    }
+    }
+    ```
 - Deve-se pensar no projeto do *frontend* como uma composição de componentes menores, coesos e não acoplados
 ***
 ## Componente Lista
@@ -163,6 +174,26 @@
         <Lista itens={minhalista}/>
     </React.StrictMode>
     );
+    ```
+## Propriedades Globais
+- Propriedades podem ser definidas globalmente na aplicação
+- Desta forma, cria-se um contexto onde dados podem ser compartilhados por todos os componentes
+```javascript
+import { createContext } from "react";
+
+const UserContext = createContext()
+
+```
+- Colocando valores no contexto
+    ```javascript
+    <UserContext.Provider value={user}>
+        <h1>{`Olá ${user}!`}</h1>
+        <Componente2 />
+    </UserContext.Provider>
+    ```
+- Obtendo valores do contexto (no caso, `Componente2`)
+    ```javascript
+    const user = useContext(UserContext);
     ```
 ## Eventos
 - Podem ser associados aos componentes relacionando uma função como responsta ao evento
@@ -379,6 +410,32 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 `http://localhost:3000/principal`
 ## Exercício
 - Implementar o componente de **Login**
+## Enviando Requisições ao backend
+- A (Fetch API)[https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API] oferece uma maneira simples de realizar requisições *HTTP* ao backend
+```javascript
+try {
+        const response = await fetch('http://localhost:5000/api/users/signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: formState.inputs.name.value,
+            email: formState.inputs.email.value,
+            password: formState.inputs.password.value
+          })
+        });
+
+        const responseData = await response.json();
+        console.log(responseData);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+```
+## Exercício
+- Implementar um formulário para o cadastro dos Prêmios utilizando como base a segunda entrega do curso
+
 ## Redirecionando
 - Utilizar o *hook* `useNavigate` para efetuar a navegação entre os componentes
     `import { useNavigate } from 'react-router-dom';`
@@ -454,3 +511,61 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
     export default Navigation;
     ```
+## Mapas
+- Mais conhecido é o (Google Maps)[https://developers.google.com/maps/documentation/javascript/overview?hl=pt-br] porém é pago
+- Versão gratuita existe o (Open Layers)[https://openlayers.org/doc/quickstart.html]
+
+## OpenLayers
+- Criar um `div` onde o mapa será exibido na `index.html`
+
+    `<div id="map" style="width: 100%; height: 400px"></div>`
+
+- Incluir a importação dos objetos na `index.html`
+```javascript
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.1.1/css/ol.css" type="text/css">
+<script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.1.1/build/ol.js"></script>
+```
+- Componente para exibir o mapa
+```javascript
+import React, { useRef, useEffect } from 'react';
+ 
+import './Map.css';
+ 
+const Map = props => {
+  const mapRef = useRef();
+  
+  const { center, zoom } = props;
+ 
+  useEffect(() => {
+    new window.ol.Map({
+      target: mapRef.current.id,
+      layers: [
+        new window.ol.layer.Tile({
+          source: new window.ol.source.OSM()
+        })
+      ],
+      view: new window.ol.View({
+        center: window.ol.proj.fromLonLat([center.lng, center.lat]),
+        zoom: zoom
+      })
+    });
+  }, [center, zoom]);
+ 
+  return (
+    <div
+      ref={mapRef}
+      className={`map ${props.className}`}
+      style={props.style}
+      id="map"
+    ></div>
+  );
+};
+ 
+export default Map;
+```
+```css
+.map {
+  width: 100%;
+  height: 100%;
+}
+```

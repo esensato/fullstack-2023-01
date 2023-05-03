@@ -1,0 +1,19 @@
+.titulo {
+    color: red;
+    text-align: center;
+    width: 100%;
+}
+
+ul {
+    list-style: none;
+    width: 300px;
+    text-align: center;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+li {
+    padding: 10px;
+    border: solid 1px rgba(138, 138, 135, 0.8);
+    margin: 10px;
+}

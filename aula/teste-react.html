@@ -1,0 +1,17 @@
+<html>
+    <head>
+        <script src="https://fb.me/react-0.14.3.js"></script>
+        <script src="https://fb.me/react-dom-0.14.3.js"></script>
+    </head>
+    <body>
+        <div id="root"></div>
+
+        <script>
+             const container = document.getElementById('root');
+             const btn = React.createElement('button',{
+                onClick: () => alert('Click')
+             }, 'Teste React');
+             ReactDOM.render(btn, container);
+        </script>
+    </body>
+</html>

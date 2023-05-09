@@ -516,52 +516,92 @@ try {
 - Versão gratuita existe o (Open Layers)[https://openlayers.org/doc/quickstart.html]
 
 ## OpenLayers
-- Criar um `div` onde o mapa será exibido na `index.html`
+- Instalar o módulo `ol`
 
-    `<div id="map" style="width: 100%; height: 400px"></div>`
-
-- Incluir a importação dos objetos na `index.html`
-```javascript
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.1.1/css/ol.css" type="text/css">
-<script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.1.1/build/ol.js"></script>
-```
+`npm install --save`
 - Componente para exibir o mapa
 ```javascript
-import React, { useRef, useEffect } from 'react';
+import './mapa.css';
+import { useRef } from 'react';
+import {Map, View, Feature} from 'ol';
+import TileLayer from 'ol/layer/Tile';
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
+import OSM from 'ol/source/OSM';
+import {Style, Icon} from 'ol/style'
+import {Point} from 'ol/geom'
+import {fromLonLat} from 'ol/proj'
+import {toLonLat} from 'ol/proj.js';
+import {toStringHDMS} from 'ol/coordinate.js';
+import Overlay from 'ol/Overlay.js';
  
-import './Map.css';
- 
-const Map = props => {
-  const mapRef = useRef();
+const Mapa = props => {
+
+  const mapaRef = useRef();
+  const popupRef = useRef();
+  const popupCloseRef = useRef();
+  const popupContentRef = useRef();
+
+  useEffect( () => {
+
+    const overlay = new Overlay({
+      element: popupRef.current
+    });
   
-  const { center, zoom } = props;
- 
-  useEffect(() => {
-    new window.ol.Map({
-      target: mapRef.current.id,
+    console.log(popupRef.current)
+    const map = new Map({
+      target: mapaRef.current,
       layers: [
-        new window.ol.layer.Tile({
-          source: new window.ol.source.OSM()
+        new TileLayer({
+          source: new OSM({attributions: []})
         })
       ],
-      view: new window.ol.View({
-        center: window.ol.proj.fromLonLat([center.lng, center.lat]),
-        zoom: zoom
+      overlays: [overlay],
+      view: new View({
+        center: [2.2931, 48.8584],
+        zoom: 3
+      })
+    
+    });
+    
+    var markers = new VectorLayer({
+      source: new VectorSource(),
+      style: new Style({
+        image: new Icon({
+          anchor: [0.5, 1],
+          src: 'http://cdn.mapmarker.io/api/v1/pin?text=P&size=50&hoffset=1'
+        })
       })
     });
-  }, [center, zoom]);
- 
-  return (
-    <div
-      ref={mapRef}
-      className={`map ${props.className}`}
-      style={props.style}
-      id="map"
-    ></div>
-  );
-};
- 
-export default Map;
+    
+    map.addLayer(markers);
+  
+    map.on('click', (event) => {
+      console.log(event.coordinate)
+        const coordinate = event.coordinate;
+        const hdms = toStringHDMS(toLonLat(coordinate));
+        popupContentRef.current.innerHTML = '<p>You clicked here:</p><code>' + hdms + '</code>';
+        overlay.setPosition(coordinate);
+    });
+    
+    var marker = new Feature(new Point(fromLonLat([106.8478695, -6.1568562])));
+    markers.getSource().addFeature(marker);  
+    marker.on('click', (event) => alert('Marker: ' + event));
+  
+    
+  }, [])
+
+
+  return <>
+  <div ref={mapaRef} className="map"></div>
+  <div ref={popupRef} className="ol-popup">
+    <a ref={popupCloseRef} className="ol-popup-closer"></a>
+    <div ref={popupContentRef}>Teste 123</div>
+  </div>
+  </> 
+}
+
+export default Mapa;
 ```
 ```css
 .map {
@@ -569,3 +609,14 @@ export default Map;
   height: 100%;
 }
 ```
+***
+## Bibliotecas de Componentes
+- Existem várias bibliotecas com componentes **React** para uso
+    - [And Design] (https://ant.design/docs/react/introduce)
+    - [Carbon] (https://react.carbondesignsystem.com/?path=/story/getting-started-welcome--welcome)
+    - [Material UI] (https://mui.com/)
+
+## And Design
+- Instalação
+
+`npm install --save antd`

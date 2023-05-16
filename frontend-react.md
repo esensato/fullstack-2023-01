@@ -412,27 +412,25 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 - Implementar o componente de **Login**
 ## Enviando Requisições ao backend
 - A (Fetch API)[https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API] oferece uma maneira simples de realizar requisições *HTTP* ao backend
-```javascript
-try {
-        const response = await fetch('http://localhost:5000/api/users/signup', {
-          method: 'POST',
-          headers: {
+    ```javascript
+    try {
+        const response = await fetch('https://controle-acesso.glitch.me/login', {
+            method: 'POST',
+            headers: {
             'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            name: formState.inputs.name.value,
-            email: formState.inputs.email.value,
-            password: formState.inputs.password.value
-          })
+            },
+            body: JSON.stringify({
+            username: formState.inputs.name.value,
+            senha: formState.inputs.password.value
+            })
         });
 
         const responseData = await response.json();
         console.log(responseData);
-      } catch (err) {
-        console.log(err);
-      }
+    } catch (err) {
+    console.log(err);
     }
-```
+    ```
 ## Exercício
 - Implementar um formulário para o cadastro dos Prêmios utilizando como base a segunda entrega do curso
 
@@ -518,37 +516,21 @@ try {
 ## OpenLayers
 - Instalar o módulo `ol`
 
-`npm install --save`
+`npm install --save ol`
 - Componente para exibir o mapa
 ```javascript
-import './mapa.css';
-import { useRef } from 'react';
-import {Map, View, Feature} from 'ol';
+import { useRef, useEffect } from 'react'
+
+import {Map, View } from 'ol';
 import TileLayer from 'ol/layer/Tile';
-import VectorLayer from 'ol/layer/Vector';
-import VectorSource from 'ol/source/Vector';
 import OSM from 'ol/source/OSM';
-import {Style, Icon} from 'ol/style'
-import {Point} from 'ol/geom'
-import {fromLonLat} from 'ol/proj'
-import {toLonLat} from 'ol/proj.js';
-import {toStringHDMS} from 'ol/coordinate.js';
-import Overlay from 'ol/Overlay.js';
- 
-const Mapa = props => {
+
+function App() {
 
   const mapaRef = useRef();
-  const popupRef = useRef();
-  const popupCloseRef = useRef();
-  const popupContentRef = useRef();
 
-  useEffect( () => {
+  useEffect(() => {
 
-    const overlay = new Overlay({
-      element: popupRef.current
-    });
-  
-    console.log(popupRef.current)
     const map = new Map({
       target: mapaRef.current,
       layers: [
@@ -556,59 +538,182 @@ const Mapa = props => {
           source: new OSM({attributions: []})
         })
       ],
-      overlays: [overlay],
       view: new View({
         center: [2.2931, 48.8584],
         zoom: 3
       })
     
     });
-    
-    var markers = new VectorLayer({
-      source: new VectorSource(),
-      style: new Style({
-        image: new Icon({
-          anchor: [0.5, 1],
-          src: 'http://cdn.mapmarker.io/api/v1/pin?text=P&size=50&hoffset=1'
-        })
-      })
-    });
-    
-    map.addLayer(markers);
   
-    map.on('click', (event) => {
-      console.log(event.coordinate)
-        const coordinate = event.coordinate;
-        const hdms = toStringHDMS(toLonLat(coordinate));
-        popupContentRef.current.innerHTML = '<p>You clicked here:</p><code>' + hdms + '</code>';
-        overlay.setPosition(coordinate);
-    });
-    
-    var marker = new Feature(new Point(fromLonLat([106.8478695, -6.1568562])));
-    markers.getSource().addFeature(marker);  
-    marker.on('click', (event) => alert('Marker: ' + event));
-  
-    
-  }, [])
+  }, []);
 
+  return (
+    <div className="map" ref={mapaRef}>
 
-  return <>
-  <div ref={mapaRef} className="map"></div>
-  <div ref={popupRef} className="ol-popup">
-    <a ref={popupCloseRef} className="ol-popup-closer"></a>
-    <div ref={popupContentRef}>Teste 123</div>
-  </div>
-  </> 
+    </div>
+  );
 }
 
-export default Mapa;
+export default App;
 ```
+- Página de estilos
 ```css
 .map {
   width: 100%;
   height: 100%;
 }
 ```
+- Obtendo as coordenadas ao clicar no mapa
+
+    `import {toLonLat} from 'ol/proj.js';`
+    ```javascript
+    map.on("click", (evt) => {
+      console.log("----> " + toLonLat(evt.coordinate))
+    });
+    ```
+- Adicionando uma camada para os marcadores
+
+    `import VectorLayer from 'ol/layer/Vector';`
+
+    `import VectorSource from 'ol/source/Vector';`
+
+    `import {Style, Icon} from 'ol/style';`
+
+    ```javascript
+    var markers = new VectorLayer({
+    source: new VectorSource(),
+    style: new Style({
+        image: new Icon({
+        anchor: [0.5, 1],
+        src: 'http://cdn.mapmarker.io/api/v1/pin?text=P&size=50&hoffset=1'
+        })
+    })
+    });
+
+    map.addLayer(markers);
+    ```
+- Adicionando um marcador
+
+    `import {Point} from 'ol/geom';`
+
+    ```javascript
+    var marker = new Feature(new Point(fromLonLat([106.8478695, -6.1568562])));
+    marker.setId("1000");
+    markers.getSource().addFeature(marker);
+    ```
+- Criando um pop-up
+    ```javascript
+    <div id="popup" class="ol-popup">
+        <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+        <div id="popup-content"></div>
+    </div>
+    ```
+- Estilo para o pop-up
+    ```css
+    .ol-popup {
+    position: absolute;
+    background-color: white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #cccccc;
+    bottom: 12px;
+    left: -50px;
+    min-width: 280px;
+    }
+    .ol-popup:after, .ol-popup:before {
+    top: 100%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    }
+    .ol-popup:after {
+    border-top-color: white;
+    border-width: 10px;
+    left: 48px;
+    margin-left: -10px;
+    }
+    .ol-popup:before {
+    border-top-color: #cccccc;
+    border-width: 11px;
+    left: 48px;
+    margin-left: -11px;
+    }
+    .ol-popup-closer {
+    text-decoration: none;
+    position: absolute;
+    top: 2px;
+    right: 8px;
+    }
+    .ol-popup-closer:after {
+    content: "✖";
+    }
+    ```
+- Criando um **Overlay** para o pop-up
+
+    `import Overlay from 'ol/Overlay.js';`
+    ```javascript
+    const overlay = new Overlay({
+    element: container,
+    autoPan: {
+        animation: {
+        duration: 250,
+        },
+    },
+    });
+    ```
+- Fechando o pop-up
+    ```javascript
+    closer.onclick = function () {
+    overlay.setPosition(undefined);
+    closer.blur();
+    return false;
+    };
+    ```
+- Incluir o **Overlay** no mapa
+    ```javascript
+    const map = new Map({
+    target: 'map',
+    layers: [
+        new TileLayer({
+        source: new OSM()
+        })
+    ],
+    overlays: [overlay],
+    view: new View({
+        center: [2.2931, 48.8584],
+        zoom: 3
+    })
+
+    });
+    ```
+- Exibindo o pop-up
+    ```javascript
+    const hdms = toStringHDMS(toLonLat(coordinate));
+    content.innerHTML = '<p>You clicked here:</p><code>' + hdms + '</code>';
+    overlay.setPosition(evt.coordinate);
+    ```
+- Pop-up no marcador
+    ```javascript
+    var feature = map.forEachFeatureAtPixel(evt.pixel, function (feat, layer) {
+        return feat;
+    }
+    );
+
+    if (feature) {
+
+    content.innerHTML = feature.get('desc');
+    overlay.setPosition(evt.coordinate);
+
+    }
+    else {
+    overlay.setPosition(undefined);
+    
+    }
+    ```
 ***
 ## Bibliotecas de Componentes
 - Existem várias bibliotecas com componentes **React** para uso

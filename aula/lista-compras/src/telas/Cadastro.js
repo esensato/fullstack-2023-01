@@ -1,7 +1,7 @@
 import React from 'react';
 import FormLista from '../form-lista/FormLista';
 import DesenhaLista from '../lista/DesenhaLista';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useParams, NavLink } from 'react-router-dom';
 
 export const Cadastro = (props) => {
@@ -14,11 +14,6 @@ export const Cadastro = (props) => {
   const adicionarItem = (item) => {
     addLista([...lista, item]);
   }
-
-  useEffect(() => {
-    const result = fetch("https://controle-gastos.glitch.me/");
-      console.log(result.json());
-  }, []);
 
   return <>
               <div style={{margin: 30}}>

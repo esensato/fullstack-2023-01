@@ -5,6 +5,7 @@ import { Html5Outlined,
          DeleteOutlined  } from '@ant-design/icons';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { ComponentesAntd } from './ComponentesAntd';
+import { ComponentesAntd2 } from './ComponentesAntd2';
 import './App.css';
 
 function App() {
@@ -15,7 +16,7 @@ function App() {
   },
   {
     path: "/usuario",
-    element: <h1>Usuario</h1>
+    element: <ComponentesAntd2 />
   },
   {
     path: "/duvida",
